@@ -1,0 +1,103 @@
+//Configuracion para la comunicacion UART del pic hacia el modulo BT
+
+//Configuracion para el Baud Rate
+BRGH = 1; //Esto configura para usar un HIGH-SPEED BAUD RATE
+BRG16 = 0;
+SPBRG = 25; //Esto setea a 9600 BAUD RATE. Que la formula para calcular esto es BaudRate=Fosc/(16*(x+1))
+
+//Configuracion para habilitar el puerto serial ascincronico
+SYNC = 0;  
+//Al estar BRGH = 1, BRG16 = 0 y SYNC = 0, se configura para que sea una transmision de 8bits asincronica
+
+SPEN = 1; //Habilita todo el circuito interno de la transmision
+
+//Setear los pines de direccion RX y TX
+TRISC6 = 0; //Para el TX
+TRISC7 = 1; //Para el RX
+
+//Configuracion para el transmisor
+//Habilitar el proceso de transmision UART
+TXEN = 1; //Habilita la generacion de los baud rates
+
+//Cargar la informacion para transmitir
+TXREG = data; //La variable data es donde va a estar nuestra informacion para transmitir
+
+//Configuracion para el receptor
+RCIE = 1;
+PEIE = 1;
+GIE = 1;
+
+//Habilita la recepcion de datos
+CREN = 1;
+
+
+
+//Ahora como quedarian las funciones para hacer funcionar esta transmision UART
+
+void UartInicializacionTX() {
+    
+    //Conf para que sea TX
+    TRISC6 = 0;
+    TRISC7 = 1;
+    
+    //Config para 8bits asincronica
+    BRGH = 1;
+    BTG16 = 0;
+    SYNC = 0;
+    
+    //Si trabajamos a 4Mhz funcionaria correctamente
+    SPBRG = 25; 
+    
+    //Hablitamos el sistema
+    SPEN = 1;
+    
+    //TXEN = 1; Hace que se empiecen a generar los 9600 BR y este todo listo para que la comunicacion empiece.
+}
+
+void UartInicializacionRX() {
+    
+    //Conf para que sea RX
+    TRISC6 = 1;
+    TRISC7 = 0;
+    
+    //Config para 8bits asincronica
+    BRGH = 1;
+    BTG16 = 0;
+    SYNC = 0;
+    
+    //Si trabajamos a 4Mhz funcionaria correctamente
+    SPBRG = 25; 
+    
+    //Hablitamos el sistema
+    SPEN = 1;
+    
+    RCIE = 1;
+    PEIE = 1;
+    GIE = 1;
+    
+    CREN = 1;
+}
+
+
+
+void UartTXEscrituraStrings(unsigned char datos[]) {        //En el caso de que lo que se quiera transmitir sea un String
+    
+    TXEN = 1;
+    for(int i = 0; i < datos.lenght; i++) {
+        TXREG = datos[i];
+        while(!TMRT) {}
+    }
+    TXEN = 0;
+}
+
+void UartTXEscritura(unsigned char datos) {                 //En el caso de que lo que se quiera transmitir sea una char
+
+    TXEN = 1;
+    while(!TRMT) {
+        TXREG = datos;
+    }
+    TXEN = 0;
+}
+
+
+
