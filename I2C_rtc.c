@@ -77,9 +77,9 @@ void NACK() {
 }
 //Send Byte Via I2C Bus, And Return The ACK/NACK From The Slave
 
-unsigned char write((unsigned char Data) {
+unsigned char write(unsigned char data) {
     set_wait();
-    SSPBUF = Data;
+    SSPBUF = data;
     set_wait();
     return ACKSTAT; // acknowledge status bit
 }
@@ -119,5 +119,4 @@ void main() {
         __delay_ms(100);
     }
     /*TRANSMITIR: "atar" su valor a una alarma de RTC para que varie cada 30s*/
-
 }

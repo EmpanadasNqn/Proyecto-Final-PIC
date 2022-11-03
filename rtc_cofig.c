@@ -5,9 +5,17 @@
 #define min  0//varaible de bt
 #define modificar 0//varaible de bt
 //led para avisar que se edita la hora
-#define ledEditar PORTC0
+#define ledEditar RC0
 #define digito1 PORTB
-//num bcd para representar numeros en display
+//Puertos de salida de los display (4 pines con transistores)
+#define disp1 RD1
+#define disp2 RD2
+#define disp3 RD3
+#define disp4 RD4
+//configuraciones que se enviarán al rtc
+int rtc_config[] = {0b00000000, hora, min, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+    0b00000000, 0b00000000, 0b10001111, 0b10000000, 0b10000000, 0b00000110, 0b00000000, 0b00000000, 0b00000000, 0b00000000};
+//arreglo de numeros bcd para mostrar los numeros en el display
 int numeros [] = {0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110, 0b01101101,
     0b01111100, 0b00000111, 0b01111111, 0b01100111};
 //variables usadas para contar, llevar registro del tiempo, y para el control
@@ -18,6 +26,24 @@ int digito4;
 //editando boolean
 int editando;
 //---------------------FINALIZA VARIABLES RELOJ---------------------------------
+
+//------------------PROCEDIMIENTO MUESTREO DISPLAYS-----------------------------
+
+void display_fix() {
+    PORTD = numeros[digito1];
+    disp1 = 1;
+    __delay_ms(5);
+    PORTD = numeros[digito2];
+    disp1 = 1;
+    __delay_ms(5);
+    PORTD = numeros[digito3];
+    disp1 = 1;
+    __delay_ms(5);
+    PORTD = numeros[digito4];
+    disp1 = 1;
+    __delay_ms(5);
+}
+//---------------------FINALIZA MUESTREO DISPLAYS-------------------------------
 
 //----------------------DETALLES DE EDICIÓN RELOJ-------------------------------
 
@@ -39,11 +65,10 @@ void editar_reloj() {
             if (digito2 > 9) {
                 digito2 = 0;
                 digito1 = digito1 + 1;
-                /*En algun lugar tengo que hacer que digito se pase a BCD*/
             }
-            if (digito1 == 3 && digito1 == 1) { // o sea si decenas está en 2 y unidades en 0
+            if (digito1 == 4 && digito1 == 2) { // o sea si decenas está en 2 y unidades en 4
                 digito1 = 0;
-                digito2 = 1;
+                digito2 = 0;
             }
             __delay_ms(100);
         }
@@ -69,11 +94,22 @@ void editar_reloj() {
 //-----------------------FINALIZA EDITAR RELOJ----------------------------------
 
 void main() {
-    //reloj se inicializa a las 00 al encenderse
+
+    TRISC = 0b00000000; //Definimos todo C como salida
+    
+
+    //INICIALIZACIÓN DE VARIABLES
+    
     digito1 = 0; //Dec de hora
     digito2 = 0; //Uni de hora
     digito3 = 0; //Dec de min
     digito4 = 0; //Uni de min
+    
+    disp1 = 0;   
+    disp2 = 0; 
+    disp3 = 0; 
+    disp4 = 0; 
+    
     hora = 0;
     min = 0;
     int cont = 0;
@@ -82,6 +118,7 @@ void main() {
     ledEditar = 1;
     /*Ciclo infinito donde se realizan las operaciones del reloj*/
     while (1) {
+        display_fix();
         if (modificar == 1) {
             modificar = 0;
             ledEditar = 0; //prendido
