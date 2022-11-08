@@ -98,6 +98,3 @@ void UartTXEscritura(unsigned char datos) {                 //En el caso de que 
     }
     TXEN = 0;
 }
-
-
-
