@@ -1,0 +1,24 @@
+unsigned char MSR_r[];
+int contador = 0;
+
+ISR() {
+    if(RCIF) {
+        unsigned char dato = RCREG;
+        MSR_r[] = new char[dato.lenght];
+
+        switch(dato) {
+            case'm':
+                MSR_r[contador] = dato;
+                break;
+            case'f':
+                configurarRTC(); //Funcion olivia de configuracion
+                break;
+            default:
+                contador++;
+                MSR_r[contador] = dato;
+                break;
+        }
+        MSR_r[0];
+        RCIF = 0;
+    }
+}
